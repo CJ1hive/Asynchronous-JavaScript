@@ -1,73 +1,69 @@
-const getCountryData = function (country) {
-  // Get general country information
-  fetch(
-    'https://countriesnow.space/api/v0.1/countries/info?returns=flag,unicodeFlag,dialCode,currency',
-  )
-    .then(response => {
-      if (!response.ok) throw new Error('Could not fetch country information');
-      return response.json();
-    })
-    .then(infoData => {
-      const data = infoData.data.find(
-        c => c.name.toLowerCase() === country.toLowerCase(),
-      );
+'use strict';
 
-      if (!data) throw new Error('Country not found');
+const btn = document.querySelector('.btn-country');
+const countriesContainer = document.querySelector('.countries');
 
-      // Get population
-      return fetch('https://countriesnow.space/api/v0.1/countries/population')
-        .then(response => {
-          if (!response.ok) throw new Error('Could not fetch population');
-          return response.json();
-        })
-        .then(populationData => {
-          const populationCountry = populationData.data.find(
-            c => c.country.toLowerCase() === country.toLowerCase(),
-          );
+// NEW COUNTRIES API URL (use instead of the URL shown in videos):
+// https://restcountries.com/v2/name/portugal
 
-          // Get the latest population
-          const latestPopulation =
-            populationCountry?.populationCounts?.at(-1)?.value || 'N/A';
+// NEW REVERSE GEOCODING API URL (use instead of the URL shown in videos):
+// https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lng}
 
-          return {
-            ...data,
-            population: latestPopulation,
-          };
-        });
-    })
-    .then(data => {
-      const html = `
-        <article class="country">
-          <img class="country__img" src="${data.flag}" />
-          <div class="country__data">
-            <h3 class="country__name">${data.name}</h3>
-            <h4 class="country__region">Country</h4>
+///////////////////////////////////////
+// const getCountry = function (coutnryName) {
+//   const request = new XMLHttpRequest(); // Oldschool way
 
-            <p class="country__row">
-              <span>👫</span>
-              ${Number(data.population).toLocaleString()} people
-            </p>
+//   // XMLHttpRequest we need it in the future
+//   // Show us how old ajax used to function back in the day
 
-            <p class="country__row">
-              <span>🗣️</span>
-              N/A
-            </p>
+//   request.open(
+//     'GET',
+//     `https://restcountries.com/v2/name/${coutnryName.toLowerCase()}`
+//   );
+//   request.send();
 
-            <p class="country__row">
-              <span>💰</span>
-              ${data.currency}
-            </p>
-          </div>
-        </article>
-      `;
+//   request.addEventListener('load', function () {
+//     const [data] = JSON.parse(this.responseText);
+//     console.log(data);
+//     const html = `
+//         <article class="country">
+//               <img class="country__img" src="${data.flag}" />
+//               <div class="country__data">
+//                 <h3 class="country__name">${data.name}</h3>
+//                 <h4 class="country__region">${data.region}</h4>
+//                 <p class="country__row"><span>👫</span>${(
+//                   +data.population / 1000000
+//                 ).toFixed(1)} M</p>
+//                 <p class="country__row"><span>🗣️</span>${
+//                   data.languages[0].name
+//                 }</p>
+//                 <p class="country__row"><span>💰</span>${
+//                   data.currencies[0].name
+//                 }</p>
+//               </div>
+//             </article>
+//         `;
 
-      document
-        .querySelector('.countries')
-        .insertAdjacentHTML('beforeend', html);
-    })
-    .catch(error => {
-      console.error(error);
-    });
-};
+//     countriesContainer.insertAdjacentHTML('beforeend', html);
+//     countriesContainer.style.opacity = 1;
+//   });
+// };
 
-getCountryData('Germany');
+// getCountry('Nigeria');
+// getCountry('Vietnam');
+// getCountry('Greece');
+// ✅✅✅✅✅✅
+
+// Callback Hell
+
+//
+const BASE_URL = 'https://countries.dev';
+
+async function getCountryData(name) {
+  const res = await fetch(`${BASE_URL}/name/${name}`);
+  const [country] = await res.json();
+  console.log(country);
+}
+
+getCountryData('portugal');
+getCountryData('spain');
