@@ -57,13 +57,49 @@ const countriesContainer = document.querySelector('.countries');
 // Callback Hell
 
 //
-const BASE_URL = 'https://countries.dev';
+// const request = fetch('https://countriesnow.space/api/v0.1/countries')
+//   .then(res => res.json())
+//   .then(data => console.log(data));
 
-async function getCountryData(name) {
-  const res = await fetch(`${BASE_URL}/name/${name}`);
-  const [country] = await res.json();
-  console.log(country);
-}
+// const getCountryData = function (coutnry) {
+//   fetch('https://countriesnow.space/api/v0.1/countries').then(
+//     function (response) {
+//       console.log(Response);
+//     },
+//   );
+// };
+// console.log(request);
+// getCountryData();
 
-getCountryData('portugal');
-getCountryData('spain');
+const renderCountry = function (data, className = '') {
+  const html = `
+  <article class="country ${className}">
+    <img class="country__img" src="${data.flags.svg}" />
+    <div class="country__data">
+      <h3 class="country__name">${data.name}</h3>
+      <h4 class="country__region">${data.region}</h4>
+      <p class="country__row"><span>👫</span>${(
+        +data.population / 1000000
+      ).toFixed(1)} people</p>
+      <p class="country__row"><span>🗣️</span>${data.languages[0].name}</p>
+      <p class="country__row"><span>💰</span>${data.currencies[0].name}</p>
+    </div>
+  </article>
+  `;
+  countriesContainer.insertAdjacentHTML('beforeend', html);
+  countriesContainer.style.opacity = 1;
+};
+
+const getCountryData = function (country) {
+  fetch(`https://countries.dev/name/${country}`)
+    .then(Response => Response.json())
+    .then(data => renderCountry(data[0]));
+  // .then(function (response) {
+  //   console.log(response);
+  //   return response.json();
+  // })
+  // .then(function (data) {
+  //   console.log(data);
+  // });
+};
+getCountryData(`iraq`);
