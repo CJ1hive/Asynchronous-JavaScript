@@ -1,117 +1,73 @@
-'use strict';
+const getCountryData = function (country) {
+  // Get general country information
+  fetch(
+    'https://countriesnow.space/api/v0.1/countries/info?returns=flag,unicodeFlag,dialCode,currency',
+  )
+    .then(response => {
+      if (!response.ok) throw new Error('Could not fetch country information');
+      return response.json();
+    })
+    .then(infoData => {
+      const data = infoData.data.find(
+        c => c.name.toLowerCase() === country.toLowerCase(),
+      );
 
-const btn = document.querySelector('.btn-country');
-const countriesContainer = document.querySelector('.countries');
+      if (!data) throw new Error('Country not found');
 
-// NEW COUNTRIES API URL (use instead of the URL shown in videos):
-// https://restcountries.com/v2/name/portugal
+      // Get population
+      return fetch('https://countriesnow.space/api/v0.1/countries/population')
+        .then(response => {
+          if (!response.ok) throw new Error('Could not fetch population');
+          return response.json();
+        })
+        .then(populationData => {
+          const populationCountry = populationData.data.find(
+            c => c.country.toLowerCase() === country.toLowerCase(),
+          );
 
-// NEW REVERSE GEOCODING API URL (use instead of the URL shown in videos):
-// https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lng}
+          // Get the latest population
+          const latestPopulation =
+            populationCountry?.populationCounts?.at(-1)?.value || 'N/A';
 
-///////////////////////////////////////
-// const getCountry = function (coutnryName) {
-//   const request = new XMLHttpRequest(); // Oldschool way
+          return {
+            ...data,
+            population: latestPopulation,
+          };
+        });
+    })
+    .then(data => {
+      const html = `
+        <article class="country">
+          <img class="country__img" src="${data.flag}" />
+          <div class="country__data">
+            <h3 class="country__name">${data.name}</h3>
+            <h4 class="country__region">Country</h4>
 
-//   // XMLHttpRequest we need it in the future
-//   // Show us how old ajax used to function back in the day
+            <p class="country__row">
+              <span>👫</span>
+              ${Number(data.population).toLocaleString()} people
+            </p>
 
-//   request.open(
-//     'GET',
-//     `https://restcountries.com/v2/name/${coutnryName.toLowerCase()}`
-//   );
-//   request.send();
+            <p class="country__row">
+              <span>🗣️</span>
+              N/A
+            </p>
 
-//   request.addEventListener('load', function () {
-//     const [data] = JSON.parse(this.responseText);
-//     console.log(data);
-//     const html = `
-//         <article class="country">
-//               <img class="country__img" src="${data.flag}" />
-//               <div class="country__data">
-//                 <h3 class="country__name">${data.name}</h3>
-//                 <h4 class="country__region">${data.region}</h4>
-//                 <p class="country__row"><span>👫</span>${(
-//                   +data.population / 1000000
-//                 ).toFixed(1)} M</p>
-//                 <p class="country__row"><span>🗣️</span>${
-//                   data.languages[0].name
-//                 }</p>
-//                 <p class="country__row"><span>💰</span>${
-//                   data.currencies[0].name
-//                 }</p>
-//               </div>
-//             </article>
-//         `;
+            <p class="country__row">
+              <span>💰</span>
+              ${data.currency}
+            </p>
+          </div>
+        </article>
+      `;
 
-//     countriesContainer.insertAdjacentHTML('beforeend', html);
-//     countriesContainer.style.opacity = 1;
-//   });
-// };
-
-// getCountry('Nigeria');
-// getCountry('Vietnam');
-// getCountry('Greece');
-// ✅✅✅✅✅✅
-
-// Callback Hell
-
-const renderCountry = function (data, className = '') {
-  const html = `
-        <article class="country ${className}">
-              <img class="country__img" src="${data.flag}" />
-              <div class="country__data">
-                <h3 class="country__name">${data.name}</h3>
-                <h4 class="country__region">${data.region}</h4>
-                <p class="country__row"><span>👫</span>${(
-                  +data.population / 1000000
-                ).toFixed(1)} M</p>
-                <p class="country__row"><span>🗣️</span>${
-                  data.languages[0].name
-                }</p>
-                <p class="country__row"><span>💰</span>${
-                  data.currencies[0].name
-                }</p>
-              </div>
-            </article>
-        `;
-
-  countriesContainer.insertAdjacentHTML('beforeend', html);
-  countriesContainer.style.opacity = 1;
-};
-
-const getCountryAndNeighbor = function (coutnryName) {
-  const request = new XMLHttpRequest(); // Oldschool way
-
-  // XMLHttpRequest we need it in the future
-  // Show us how old ajax used to function back in the day
-
-  request.open(
-    'GET',
-    `https://restcountries.com/v2/name/${coutnryName.toLowerCase()}`,
-  );
-  request.send();
-
-  request.addEventListener('load', function () {
-    const [data] = JSON.parse(this.responseText);
-    console.log(data);
-
-    renderCountry(data);
-
-    // Get AJAX CALL neighbor country (2) depends on call (1)
-    const neighbor = data.borders?.[0];
-    if (!neighbor) return;
-    const request2 = new XMLHttpRequest();
-
-    request2.open('GET', `https://restcountries.com/v2/alpha/${neighbor}`);
-    request2.send();
-
-    request2.addEventListener('load', function () {
-      const data2 = JSON.parse(this.responseText);
-      console.log(data2);
-      renderCountry(data2, 'neighbour');
+      document
+        .querySelector('.countries')
+        .insertAdjacentHTML('beforeend', html);
+    })
+    .catch(error => {
+      console.error(error);
     });
-  });
 };
 
-getCountryAndNeighbor('Argentina');
+getCountryData('Germany');
