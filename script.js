@@ -93,7 +93,16 @@ const renderCountry = function (data, className = '') {
 const getCountryData = function (country) {
   fetch(`https://countries.dev/name/${country}`)
     .then(Response => Response.json())
-    .then(data => renderCountry(data[0]));
+    .then(data => {
+      renderCountry(data[0]);
+      const neighbour = data[0].borders[0];
+      console.log(data[0].borders);
+      if (!neighbour) return;
+
+      return fetch(`https://countries.dev/name/${neighbour}`);
+    })
+    .then(Response => Response.json())
+    .then(data => renderCountry(data, 'neighbour'));
   // .then(function (response) {
   //   console.log(response);
   //   return response.json();
