@@ -95,11 +95,11 @@ const getCountryData = function (country) {
     .then(Response => Response.json())
     .then(data => {
       renderCountry(data[0]);
-      const neighbour = data[0].borders[0];
-      console.log(data[0].borders);
+      const neighbour = data[0].borders[2];
+      console.log(neighbour);
       if (!neighbour) return;
 
-      return fetch(`https://countries.dev/name/${neighbour}`);
+      return fetch(`https://countries.dev/alpha/${neighbour}`);
     })
     .then(Response => Response.json())
     .then(data => renderCountry(data, 'neighbour'));
