@@ -93,36 +93,61 @@ const renderError = function (msg) {
 // console.log(request);
 // getCountryData();
 
+// const getCountryData = function (country) {
+//   fetch(`https://countries.dev/name/${country}`)
+//     .then(Response => Response.json())
+//     .then(data => {
+//       renderCountry(data[0]);
+//       console.log(data[0]);
+
+//       const neighbour = data[0].borders[5];
+//       if (!neighbour) return;
+
+//       return fetch(`https://countries.dev/alpha/${neighbour}`);
+//     })
+//     .then(Response => Response.json())
+//     .then(data => renderCountry(data, 'neighbour'))
+//     .catch(err => {
+//       console.error(`${err} there is an error`);
+//       renderError(`something went wrong PAL ${err.message}. try again`);
+//     })
+//     .finally(() => {
+//       countriesContainer.style.opacity = 1;
+//     });
+
+// };
+const getJson = function (url, errorMsg = `something went wrong P..Pal`) {
+  return fetch(url).then(response => {
+    if (!response.ok) throw new Error(`${errorMsg} (${response.status})`);
+    return response.json();
+  });
+};
+
 const getCountryData = function (country) {
-  fetch(`https://countries.dev/name/${country}`)
-    .then(Response => Response.json())
+  getJson(`https://countries.dev/name/${country}`, `country not found`)
     .then(data => {
       renderCountry(data[0]);
       console.log(data[0]);
 
       const neighbour = data[0].borders[5];
-      if (!neighbour) return;
+      if (!neighbour) throw new Error(`NO neighbour found!`);
 
-      return fetch(`https://countries.dev/alpha/${neighbour}`);
+      return getJson(
+        `https://countries.dev/alpha/${neighbour}`,
+        `country not found`,
+      );
     })
-    .then(Response => Response.json())
+
     .then(data => renderCountry(data, 'neighbour'))
     .catch(err => {
-      console.error(`${err} there is an error`);
+      console.error(`${err}`);
       renderError(`something went wrong PAL ${err.message}. try again`);
     })
     .finally(() => {
       countriesContainer.style.opacity = 1;
     });
-  // .then(function (response) {
-  //   console.log(response);
-  //   return response.json();
-  // })
-  // .then(function (data) {
-  //   console.log(data);
-  // });
 };
 btn.addEventListener('click', function () {
-  getCountryData(`ukrain`);
+  getCountryData(`australia`);
 });
-getCountryData(`ajdsjadla`);
+// getCountryData(`ajdsjadla`);
