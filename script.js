@@ -151,6 +151,8 @@ const renderError = function (msg) {
 //   getCountryData(`iraq`);
 // });
 // // getCountryData(`ajdsjadla`);
+
+/*
 const reverseGeocode = function (lat, lon) {
   fetch(
     `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`,
@@ -176,3 +178,13 @@ const reverseGeocode = function (lat, lon) {
 reverseGeocode(52.508, 13.381);
 reverseGeocode(33.2237, 43.6859);
 reverseGeocode(60, 100);
+*/
+console.log(`test start`);
+setTimeout(() => console.log(`0 time out ended`), 0);
+Promise.resolve(`promis is resolved 1`).then(res => console.log(res));
+Promise.resolve(`promis is resolved 2`).then(res => {
+  for (let i = 0; i < 100000000; i++) {}
+  console.log(res);
+});
+
+console.log(`test ended`);
