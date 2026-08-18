@@ -179,12 +179,32 @@ reverseGeocode(52.508, 13.381);
 reverseGeocode(33.2237, 43.6859);
 reverseGeocode(60, 100);
 */
-console.log(`test start`);
-setTimeout(() => console.log(`0 time out ended`), 0);
-Promise.resolve(`promis is resolved 1`).then(res => console.log(res));
-Promise.resolve(`promis is resolved 2`).then(res => {
-  for (let i = 0; i < 100000000; i++) {}
-  console.log(res);
-});
+// console.log(`test start`);
+// setTimeout(() => console.log(`0 time out ended`), 0);
+// Promise.resolve(`promis is resolved 1`).then(res => console.log(res));
+// Promise.resolve(`promis is resolved 2`).then(res => {
+//   for (let i = 0; i < 100000000; i++) {}
+//   console.log(res);
+// });
 
-console.log(`test ended`);
+// console.log(`test ended`);
+
+const wait = function (second) {
+  return new Promise(function (resolve) {
+    setTimeout(resolve, second * 1000);
+  });
+};
+
+wait(1)
+  .then(res => {
+    console.log(`1 second passed`);
+    return wait(1);
+  })
+  .then(res => {
+    console.log(`2 seconds passed`);
+    return wait(1);
+  })
+  .then(res => {
+    console.log(`3 seconds passed`);
+    return wait(1);
+  });
