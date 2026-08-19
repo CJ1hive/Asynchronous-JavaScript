@@ -189,22 +189,82 @@ reverseGeocode(60, 100);
 
 // console.log(`test ended`);
 
+// const wait = function (second) {
+//   return new Promise(function (resolve) {
+//     setTimeout(resolve, second * 1000);
+//   });
+// };
+
+// wait(1)
+//   .then(res => {
+//     console.log(`1 second passed`);
+//     return wait(1);
+//   })
+//   .then(res => {
+//     console.log(`2 seconds passed`);
+//     return wait(1);
+//   })
+//   .then(res => {
+//     console.log(`3 seconds passed`);
+//     return wait(1);
+//   });
+
 const wait = function (second) {
   return new Promise(function (resolve) {
-    setTimeout(resolve, second * 1000);
+    setTimeout(resolve, second * 2000);
   });
 };
 
-wait(1)
-  .then(res => {
-    console.log(`1 second passed`);
-    return wait(1);
-  })
-  .then(res => {
-    console.log(`2 seconds passed`);
-    return wait(1);
-  })
-  .then(res => {
-    console.log(`3 seconds passed`);
-    return wait(1);
+const imgContainer = document.querySelector('.images');
+const createImage = function (imgPath) {
+  return new Promise(function (resolve, reject) {
+    const img = document.createElement('img');
+    img.src = imgPath;
+    img.addEventListener('load', function () {
+      imgContainer.append(img);
+      resolve(img);
+    });
+    img.addEventListener('load', function () {
+      reject(new Error(`Image is not found`));
+    });
   });
+};
+let currentImg;
+createImage(`img/img-1.jpg`)
+  .then(img => {
+    currentImg = img;
+    console.log(`img one is loaded`);
+    return wait(2);
+  })
+  .then(() => {
+    currentImg.style.display = 'none';
+    return createImage(`img/img-2.jpg`);
+  })
+  .then(img => {
+    currentImg = img;
+    console.log(`img two is loaded`);
+    return wait(2);
+  })
+  .then(() => {
+    currentImg.style.display = 'none';
+    return createImage(`img/img-3.jpg`);
+  })
+  .then(img => {
+    currentImg = img;
+    console.log(`img three is loaded`);
+    return wait(2);
+  })
+  .catch(err => console.error(err));
+// createImage(1)
+//   .then(function () {
+//     const Img = document.createElement('img');
+//     Img.src = 'img/img-1.jpg';
+//     return document.body.appendChild(Img);
+//   })
+//   .then(function () {
+//     Img.srcstyle.opacity = 0;
+//     const Img = document.createElement('img');
+//     Img.src = 'img/img-2.jpg';
+//     return document.body.appendChild(Img);
+//     return createImage(3);
+//   });
