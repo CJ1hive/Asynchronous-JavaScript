@@ -209,52 +209,52 @@ reverseGeocode(60, 100);
 //     return wait(1);
 //   });
 
-const wait = function (second) {
-  return new Promise(function (resolve) {
-    setTimeout(resolve, second * 2000);
-  });
-};
+// const wait = function (second) {
+//   return new Promise(function (resolve) {
+//     setTimeout(resolve, second * 2000);
+//   });
+// };
 
-const imgContainer = document.querySelector('.images');
-const createImage = function (imgPath) {
-  return new Promise(function (resolve, reject) {
-    const img = document.createElement('img');
-    img.src = imgPath;
-    img.addEventListener('load', function () {
-      imgContainer.append(img);
-      resolve(img);
-    });
-    img.addEventListener('load', function () {
-      reject(new Error(`Image is not found`));
-    });
-  });
-};
-let currentImg;
-createImage(`img/img-1.jpg`)
-  .then(img => {
-    currentImg = img;
-    console.log(`img one is loaded`);
-    return wait(2);
-  })
-  .then(() => {
-    currentImg.style.display = 'none';
-    return createImage(`img/img-2.jpg`);
-  })
-  .then(img => {
-    currentImg = img;
-    console.log(`img two is loaded`);
-    return wait(2);
-  })
-  .then(() => {
-    currentImg.style.display = 'none';
-    return createImage(`img/img-3.jpg`);
-  })
-  .then(img => {
-    currentImg = img;
-    console.log(`img three is loaded`);
-    return wait(2);
-  })
-  .catch(err => console.error(err));
+// const imgContainer = document.querySelector('.images');
+// const createImage = function (imgPath) {
+//   return new Promise(function (resolve, reject) {
+//     const img = document.createElement('img');
+//     img.src = imgPath;
+//     img.addEventListener('load', function () {
+//       imgContainer.append(img);
+//       resolve(img);
+//     });
+//     img.addEventListener('load', function () {
+//       reject(new Error(`Image is not found`));
+//     });
+//   });
+// };
+// let currentImg;
+// createImage(`img/img-1.jpg`)
+//   .then(img => {
+//     currentImg = img;
+//     console.log(`img one is loaded`);
+//     return wait(2);
+//   })
+//   .then(() => {
+//     currentImg.style.display = 'none';
+//     return createImage(`img/img-2.jpg`);
+//   })
+//   .then(img => {
+//     currentImg = img;
+//     console.log(`img two is loaded`);
+//     return wait(2);
+//   })
+//   .then(() => {
+//     currentImg.style.display = 'none';
+//     return createImage(`img/img-3.jpg`);
+//   })
+//   .then(img => {
+//     currentImg = img;
+//     console.log(`img three is loaded`);
+//     return wait(2);
+//   })
+//   .catch(err => console.error(err));
 // createImage(1)
 //   .then(function () {
 //     const Img = document.createElement('img');
@@ -268,3 +268,33 @@ createImage(`img/img-1.jpg`)
 //     return document.body.appendChild(Img);
 //     return createImage(3);
 //   });
+const getPosition = function () {
+  return new Promise(function (resolve, reject) {
+    navigator.geolocation.getCurrentPosition(resolve, reject);
+  });
+};
+
+const whereAmI = async function () {
+  try {
+    const pos = await getPosition();
+    const { latitude: lat, longitude: lng } = pos.coords;
+
+    const resGeo = await fetch(
+      `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`,
+    );
+    const dataGeo = await resGeo.json();
+    console.log(dataGeo);
+
+    const res = await fetch(
+      `https://countries.dev/name/${dataGeo.address.country}`,
+    );
+    const data = await res.json();
+    console.log(data);
+    renderCountry(data[0]);
+  } catch (err) {
+    renderError(`Something went wrong: ${err.message}`);
+  }
+};
+
+whereAmI();
+console.log(`FIRST`);
