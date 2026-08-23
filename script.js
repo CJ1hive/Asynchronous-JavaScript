@@ -116,12 +116,12 @@ const renderError = function (msg) {
 // //     });
 
 // // };
-// const getJson = function (url, errorMsg = `something went wrong P..Pal`) {
-//   return fetch(url).then(response => {
-//     if (!response.ok) throw new Error(`${errorMsg} (${response.status})`);
-//     return response.json();
-//   });
-// };
+const getJson = function (url, errorMsg = `something went wrong P..Pal`) {
+  return fetch(url).then(response => {
+    if (!response.ok) throw new Error(`${errorMsg} (${response.status})`);
+    return response.json();
+  });
+};
 
 // const getCountryData = function (country) {
 //   getJson(`https://countries.dev/name/${country}`, `country not found`)
@@ -268,45 +268,58 @@ reverseGeocode(60, 100);
 //     return document.body.appendChild(Img);
 //     return createImage(3);
 //   });
-const getPosition = function () {
-  return new Promise(function (resolve, reject) {
-    navigator.geolocation.getCurrentPosition(resolve, reject);
-  });
-};
+// const getPosition = function () {
+//   return new Promise(function (resolve, reject) {
+//     navigator.geolocation.getCurrentPosition(resolve, reject);
+//   });
+// };
 
-const whereAmI = async function () {
+// const whereAmI = async function () {
+//   try {
+//     const pos = await getPosition();
+//     const { latitude: lat, longitude: lng } = pos.coords;
+
+//     const resGeo = await fetch(
+//       `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`,
+//     );
+//     const dataGeo = await resGeo.json();
+//     console.log(dataGeo);
+
+//     const res = await fetch(
+//       `https://countries.dev/name/${dataGeo.address.country}`,
+//     );
+//     const data = await res.json();
+//     console.log(data);
+//     renderCountry(data[0]);
+//     return `you are in ${dataGeo.address.city} , ${dataGeo.address.country}`;
+//   } catch (err) {
+//     renderError(`Something went wrong: ${err.message}`);
+//   }
+// };
+// console.log(`1: starting`);
+// whereAmI()
+//   .then(city => console.log(city))
+//   .catch(err => console.error(`2: ${err.message}`))
+//   .finally(() => console.log(`3 : finish getting location`));
+// (async function () {
+//   try {
+//     const city = await whereAmI();
+//     console.log(city);
+//   } catch (err) {
+//     console.error(`2: ${err.message}`);
+//   }
+//   console.log(`3 : finish getting location`);
+// })();
+const get3Counteries = async function (c1, c2, c137) {
   try {
-    const pos = await getPosition();
-    const { latitude: lat, longitude: lng } = pos.coords;
-
-    const resGeo = await fetch(
-      `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`,
-    );
-    const dataGeo = await resGeo.json();
-    console.log(dataGeo);
-
-    const res = await fetch(
-      `https://countries.dev/name/${dataGeo.address.country}`,
-    );
-    const data = await res.json();
-    console.log(data);
-    renderCountry(data[0]);
-    return `you are in ${dataGeo.address.city} , ${dataGeo.address.country}`;
+    const data = await Promise.all([
+      getJson(`https://countries.dev/name/${c1}`),
+      getJson(`https://countries.dev/name/${c2}`),
+      getJson(`https://countries.dev/name/${c137}`),
+    ]);
+    console.log(data.map(d => d[0].capital));
   } catch (err) {
-    renderError(`Something went wrong: ${err.message}`);
+    console.error(err);
   }
 };
-console.log(`1: starting`);
-whereAmI()
-  .then(city => console.log(city))
-  .catch(err => console.error(`2: ${err.message}`))
-  .finally(() => console.log(`3 : finish getting location`));
-(async function () {
-  try {
-    const city = await whereAmI();
-    console.log(city);
-  } catch (err) {
-    console.error(`2: ${err.message}`);
-  }
-  console.log(`3 : finish getting location`);
-})();
+get3Counteries(`iraq`, `turkey`, `germany`);
