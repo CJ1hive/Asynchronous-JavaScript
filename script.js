@@ -291,10 +291,22 @@ const whereAmI = async function () {
     const data = await res.json();
     console.log(data);
     renderCountry(data[0]);
+    return `you are in ${dataGeo.address.city} , ${dataGeo.address.country}`;
   } catch (err) {
     renderError(`Something went wrong: ${err.message}`);
   }
 };
-
-whereAmI();
-console.log(`FIRST`);
+console.log(`1: starting`);
+whereAmI()
+  .then(city => console.log(city))
+  .catch(err => console.error(`2: ${err.message}`))
+  .finally(() => console.log(`3 : finish getting location`));
+(async function () {
+  try {
+    const city = await whereAmI();
+    console.log(city);
+  } catch (err) {
+    console.error(`2: ${err.message}`);
+  }
+  console.log(`3 : finish getting location`);
+})();
